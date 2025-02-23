@@ -1,0 +1,8 @@
+../.gitignore
+.github/
+node_modules/
+dist/
+.idea/
+.angular/
+.bolt/
+README.md

@@ -1,0 +1,61 @@
+name: Build and Deploy React App
+
+on:
+  push:
+    branches:
+      - main  # Déclenchement sur push vers la branche principale
+  pull_request:
+    branches:
+      - main  # Vérification sur les PR
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          cd 1-Front
+          npm install --frozen-lockfile
+
+      - name: Run linter
+        run: |
+          cd 1-Front
+          npm run lint
+
+      - name: Build the React app
+        run: |
+          cd 1-Front
+          npm run build
+
+      - name: Get version from package.json
+        id: get_version
+        run: |
+          VERSION=$(jq -r '.version' < 1-Front/package.json)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+  docker:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Login to GitHub Container Registry
+        run: echo "${{ secrets.CR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build and Push Docker Image
+        run: |
+          cd 1-Front
+          docker build -t ghcr.io/${{ github.repository }}:${{ env.VERSION }} -t ghcr.io/${{ github.repository }}:latest .
+          docker push ghcr.io/${{ github.repository }}:${{ env.VERSION }}
+          docker push ghcr.io/${{ github.repository }}:latest
