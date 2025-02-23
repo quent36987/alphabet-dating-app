@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Smile } from 'lucide-react';
+import { ArrowLeft, Plus } from 'lucide-react';
 import { activities } from '../data/activities';
 import type { Activity } from '../types';
 
