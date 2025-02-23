@@ -23,23 +23,23 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd 1-Front
+          cd 0-Front
           npm install --frozen-lockfile
 
       - name: Run linter
         run: |
-          cd 1-Front
+          cd 0-Front
           npm run lint
 
       - name: Build the React app
         run: |
-          cd 1-Front
+          cd 0-Front
           npm run build
 
       - name: Get version from package.json
         id: get_version
         run: |
-          VERSION=$(jq -r '.version' < 1-Front/package.json)
+          VERSION=$(jq -r '.version' < 0-Front/package.json)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
   docker:
@@ -55,7 +55,7 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          cd 1-Front
+          cd 0-Front
           docker build -t ghcr.io/${{ github.repository }}:${{ env.VERSION }} -t ghcr.io/${{ github.repository }}:latest .
           docker push ghcr.io/${{ github.repository }}:${{ env.VERSION }}
           docker push ghcr.io/${{ github.repository }}:latest
